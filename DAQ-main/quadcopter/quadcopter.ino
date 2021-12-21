@@ -5,7 +5,7 @@
 #include <SBUS2.h>
 #include <NMEAGPS.h>
 
-#include "D:/General/GitHub/bobcat-common/include/common.h"
+#include "D:/General/GitHub/bobcat-common/serial_comms/include/serial_comms/serial_msg_common.h"
 #include "config.h"
 #include "quadcopter.h"
 
@@ -81,7 +81,7 @@ void HandleSerialMsg() {
     recvd_char = Serial.read();
     if (recv_in_progress)
     {
-      if (recvd_char != MSG_END_INDICATOR)
+      if (recvd_char != SERIAL_MSG_END_INDICATOR)
       {
         recvd_chars[msg_idx] = recvd_char;
         msg_idx++;
@@ -100,7 +100,7 @@ void HandleSerialMsg() {
       }
     }
 
-    else if (recvd_char == MSG_START_INDICATOR) {
+    else if (recvd_char == SERIAL_MSG_START_INDICATOR) {
       recv_in_progress = true;
     }
   }
@@ -119,9 +119,9 @@ void HandleSerialMsg() {
   }
   if (last_joystick_msg_publish > joystick_publish_rate_ms) {
     //send stick data over Serial
-    //    Serial << MSG_START_INDICATOR << uint8_t(DAQ_SERIAL_MSG::JOYSTICK_MSG) << "," << thr_stick << "," <<
-    //           roll_stick << "," << pitch_stick << "," << yaw_stick << "," << is_armed << "," <<
-    //           vehicle_state << MSG_END_INDICATOR << endl;
+    Serial << SERIAL_MSG_START_INDICATOR << uint8_t(DAQ_SERIAL_MSG::JOYSTICK_MSG) << "," << thr_stick << "," <<
+           roll_stick << "," << pitch_stick << "," << yaw_stick << "," << is_armed << "," <<
+           vehicle_state << SERIAL_MSG_END_INDICATOR << endl;
     last_joystick_msg_publish = 0;
   }
 }
@@ -134,12 +134,13 @@ void ParseCompleteSerialMsg() {
   daq_serial_msg_type = atoi(strtok_idx);
   uint8_t serial_msg_data_len;
   int16_t serial_msg_data[msg_max_len];
-
+  
   switch (daq_serial_msg_type) {
     case uint8_t(DAQ_SERIAL_MSG::NOT_A_MSG) :
       break;
 
     case uint8_t(DAQ_SERIAL_MSG::PING) :
+      Serial << SERIAL_MSG_START_INDICATOR << uint8_t(DAQ_SERIAL_MSG::PING) << SERIAL_MSG_END_INDICATOR << endl;
       break;
 
     case uint8_t(DAQ_SERIAL_MSG::ENGAGE_FAILSAFE) :

@@ -12,6 +12,6 @@ const uint8_t msg_max_len = 100;
 
 const uint16_t joystick_mid = 1000;
 
-unsigned long joystick_publish_rate_ms = 50;
+unsigned long joystick_publish_rate_ms = 500;
 unsigned long joystick_timeout_ms = 1500;
 unsigned long gps_publish_rate_ms = 1000;
